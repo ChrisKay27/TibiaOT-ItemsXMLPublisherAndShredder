@@ -17,8 +17,8 @@ public class LoadIntoDB {
     private static String database = "databasename";
     private static String pathToItemsXml = "C:\path to\items.xml";
 
-    public static void main(String[] args) throws Exception {
-
+   public static void main(String[] args) throws Exception {
+        //if( true ) return;
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         } catch (Exception ex) {
@@ -46,7 +46,7 @@ public class LoadIntoDB {
         stmt.execute("TRUNCATE items;");
         stmt.execute("TRUNCATE item_attributes;");
 
-
+        String ID = "id", NAME = "name", FROMID = "fromid", TOID = "toid", ARTICLE = "article", KEY = "key", VALUE = "value", CHANCE = "chance", RANDOM_MIN="random_min", RANDOM_MAX="random_max";
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -56,39 +56,44 @@ public class LoadIntoDB {
         NodeList items = doc.getElementsByTagName("item");
 
         for (int i = 0; i < items.getLength() ; i++) {
+            if( i == items.getLength()/2 )
+                System.out.println("Half way done!");
+
             Node item = items.item(i);
 
             NamedNodeMap nnm = item.getAttributes();
-            Node tmpN = nnm.getNamedItem("id");
+            Node tmpN = nnm.getNamedItem(ID);
             String tmp;
 
             if( tmpN == null )
-                tmpN = nnm.getNamedItem("fromid");
+                tmpN = nnm.getNamedItem(FROMID);
 
             int id = Integer.parseInt(tmpN.getNodeValue());
             int fromid = -1;
             int toid = -1;
             String article=null;
-            String name = "";
+            String name;
 
 
-            tmpN = nnm.getNamedItem("fromid");
+            tmpN = nnm.getNamedItem(FROMID);
             if( tmpN != null )
                 fromid = Integer.parseInt(tmpN.getNodeValue());
 
-            tmpN = nnm.getNamedItem("toid");
+            tmpN = nnm.getNamedItem(TOID);
             if( tmpN != null )
                 toid = Integer.parseInt(tmpN.getNodeValue());
 
-            tmpN = nnm.getNamedItem("article");
+            tmpN = nnm.getNamedItem(ARTICLE);
             if( tmpN != null )
                 article = tmpN.getNodeValue();
 
-            tmpN = nnm.getNamedItem("name");
+            tmpN = nnm.getNamedItem(NAME);
             if( tmpN != null )
                 name = tmpN.getNodeValue();
+            else
+                name = "";
 
-            if( name != null ) name = name.replace("'","''");
+            if( name != null ) name = name.replaceAll("'","''");
 
 
             try {
@@ -111,24 +116,24 @@ public class LoadIntoDB {
                     int chance=-1, random_min=-1,random_max= -1;
 
 
-                    tmpN = nnm.getNamedItem("key");
+                    tmpN = nnm.getNamedItem(KEY);
                     if( tmpN != null )
                         key = tmpN.getNodeValue();
-                    tmpN = nnm.getNamedItem("value");
+                    tmpN = nnm.getNamedItem(VALUE);
                     if( tmpN != null )
                         value = tmpN.getNodeValue();
-                    tmpN = nnm.getNamedItem("chance");
+                    tmpN = nnm.getNamedItem(CHANCE);
                     if( tmpN != null )
                         chance = Integer.parseInt(tmpN.getNodeValue());
-                    tmpN = nnm.getNamedItem("random_min");
+                    tmpN = nnm.getNamedItem(RANDOM_MIN);
                     if( tmpN != null )
                         random_min = Integer.parseInt(tmpN.getNodeValue());
-                    tmpN = nnm.getNamedItem("random_max");
+                    tmpN = nnm.getNamedItem(RANDOM_MAX);
                     if( tmpN != null )
                         random_max = Integer.parseInt(tmpN.getNodeValue());
 
-                    if( key != null ) key = key.replace("'","''");
-                    if( value != null ) value = value.replace("'","''");
+                    if( key != null ) key = key.replaceAll("'","''");
+                    if( value != null ) value = value.replaceAll("'","''");
 
 
                     query = "INSERT INTO item_attributes  values ("+
