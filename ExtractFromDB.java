@@ -17,6 +17,7 @@ public class ExtractFromDB {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
+            // handle the error
         }
         Connection conn = null;
         Statement stmt = null;
@@ -37,7 +38,7 @@ public class ExtractFromDB {
         String item = "\t<item ", ATTR = "\t\t<attribute ",ENDITEM = "\t</item>\n";
         String ID = "id", NAME = "name", FROMID = "fromid", TOID = "toid", ARTICLE = "article", KEY = "key", VALUE = "value", CHANCE = "chance", RANDOM_MIN="random_min", RANDOM_MAX="random_max";
         String EQ = "=\"",CLOSE = "\" ",ENDSLASH="/>\n",END=">\n";
-
+        String SELECT_ATTR_QUERRY = "SELECT * FROM item_attributes WHERE item_id=";
 
         BufferedWriter writer = null;
         try{
@@ -51,7 +52,16 @@ public class ExtractFromDB {
             //System.out.println(query);
             ResultSet items = stmt.executeQuery(query);
 
+            int size = items.getFetchSize();
+            int count=0;
             while(items.next()){
+                if( count == size/4 )
+                    System.out.println("Quarter way done!");
+                if( count == size/2 )
+                    System.out.println("Half way done!");
+                if( count == (size*3)/4 )
+                    System.out.println("Three quarters done!");
+                count++;
 
                 int id = items.getInt(ID);
                 String name = items.getString(NAME);
@@ -77,10 +87,11 @@ public class ExtractFromDB {
                     writer.write(NAME+EQ+name+CLOSE);
 
 
+                writer.flush();
 
                 boolean hasAttributes = false;
                 stmt = conn.createStatement();
-                ResultSet attributes = stmt.executeQuery("SELECT * FROM item_attributes WHERE item_id="+id+";");
+                ResultSet attributes = stmt.executeQuery(SELECT_ATTR_QUERRY+id);
 
                 while( attributes.next() ){
                     if( !hasAttributes ) {
@@ -96,7 +107,7 @@ public class ExtractFromDB {
 
                     int chance = attributes.getInt(CHANCE);
                     int random_min = attributes.getInt(RANDOM_MIN);
-                    int random_max = attributes.getInt(RANDOM_MIN);
+                    int random_max = attributes.getInt(RANDOM_MAX);
 
                     writer.write(KEY+EQ+key+CLOSE);
                     writer.write(VALUE+EQ+value+CLOSE);
@@ -115,9 +126,14 @@ public class ExtractFromDB {
                     writer.write(ENDITEM);
                 else
                     writer.write(ENDSLASH);
+
+                writer.flush();
             }
 
-            writer.write("</items>");        
+
+            writer.write("</items>");
+            //Close writer
+            writer.close();
         }
         finally{
             writer.close();
