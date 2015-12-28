@@ -16,7 +16,8 @@ public class LoadIntoDB {
     private static String sqlPass = "databasePassword";
     private static String database = "databasename";
     private static String pathToItemsXml = "C:\path to\items.xml";
-
+    
+    
    public static void main(String[] args) throws Exception {
         //if( true ) return;
         try {
@@ -128,12 +129,18 @@ public class LoadIntoDB {
                     tmpN = nnm.getNamedItem(RANDOM_MIN);
                     if( tmpN != null )
                         random_min = Integer.parseInt(tmpN.getNodeValue());
+
                     tmpN = nnm.getNamedItem(RANDOM_MAX);
                     if( tmpN != null )
                         random_max = Integer.parseInt(tmpN.getNodeValue());
 
                     if( key != null ) key = key.replaceAll("'","''");
-                    if( value != null ) value = value.replaceAll("'","''");
+                    if( value != null ) {
+                        value = value.replaceAll("'","''");
+                        value = value.replaceAll("\"","&quot;");
+                    }
+
+
 
 
                     query = "INSERT INTO item_attributes  values ("+
