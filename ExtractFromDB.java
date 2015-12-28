@@ -8,7 +8,7 @@ public class ExtractFromDB {
     private static String sqlUser = "databaseUsername";
     private static String sqlPass = "databasePassword";
     private static String database = "databasename";
-    private static String pathToItemsXml = "C:\path to\items2.xml";
+    private static String pathToItemsXml = "C:\path to\items.xml";
 
 
     public static void main(String[] args) throws Exception {
